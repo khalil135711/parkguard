@@ -226,7 +226,14 @@ async function voidFine(id){ if(!confirm("Strafe wirklich stornieren?")) return;
 async function finePaid(id){ await api(`/api/admin/fines/${id}/paid`, {method:"POST"}); toast("Als bezahlt markiert"); render(); }
 async function wlAdd(e){ e.preventDefault(); await api("/api/admin/whitelist", {method:"POST", body: JSON.stringify({plate:$("#wp").value, note:$("#wn").value})}); toast("Hinzugefügt"); render(); }
 async function wlDel(p){ await api("/api/admin/whitelist/"+encodeURIComponent(p), {method:"DELETE"}); toast("Entfernt"); render(); }
-async function openPdf(id){ const b = await (await api(`/api/admin/fines/${id}/pdf`)).blob(); window.open(URL.createObjectURL(b), "_blank"); }
+async function openPdf(id){
+  const w = window.open("", "_blank");   // sofort öffnen, sonst blockiert der Browser das Popup
+  try {
+    const b = await (await api(`/api/admin/fines/${id}/pdf`)).blob();
+    const url = URL.createObjectURL(new Blob([b], {type:"application/pdf"}));
+    if (w) w.location.href = url; else location.href = url;
+  } catch(e) { if (w) w.close(); toast("PDF konnte nicht geladen werden (" + e.message + ")"); }
+}
 async function showImg(id){ try { const b = await (await api(`/api/admin/sessions/${id}/image`)).blob(); $("#dlgImg").src = URL.createObjectURL(b); $("#dlg").showModal(); } catch { toast("Kein Foto vorhanden"); } }
 
 if (KEY) start(); else $("#login").hidden = false;
