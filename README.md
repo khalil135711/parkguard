@@ -1,6 +1,10 @@
 # ParkGuard
 
+<img width="870" height="1296" alt="Bildschirmfoto 2026-11-16 um 17 42 02" src="https://github.com/user-attachments/assets/7f93f352-8383-4c1f-9700-750d0533c24b" />
+
 Parkzeit-Überwachung mit Kamera, automatischem Strafzettel-PDF und Bezahlung per Automat (Karte / PayPal).
+
+<img width="1756" height="980" alt="Bildschirmfoto 2026-11-16 um 17 45 00" src="https://github.com/user-attachments/assets/a1919eb5-88f9-4a43-ae9e-b3d92f61f1f1" />
 
 ## Architektur
 
