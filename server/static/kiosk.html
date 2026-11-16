@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parkautomat</title>
+<style>
+ :root{color-scheme:light dark;font-family:system-ui,sans-serif}
+ body{max-width:520px;margin:2rem auto;padding:0 1rem}
+ input,button{font-size:1.4rem;padding:.7rem;width:100%;box-sizing:border-box;margin:.4rem 0;border-radius:8px}
+ input{text-transform:uppercase;text-align:center;letter-spacing:.1em}
+ .box{border:1px solid #8884;border-radius:12px;padding:1rem;margin-top:1rem}
+</style></head><body>
+<h1>Parkautomat</h1>
+<input id="plate" placeholder="Kennzeichen, z. B. BN AB 123" autofocus>
+<button onclick="lookup()">Suchen</button>
+<div id="out"></div>
+<script>
+const p=new URLSearchParams(location.search);
+if(p.get("paid")) document.getElementById("out").innerHTML='<div class="box"><b>Zahlung erhalten. Danke!</b></div>';
+if(p.get("plate")){plate.value=p.get("plate");lookup();}
+const eur=c=>(c/100).toFixed(2)+" €";
+async function lookup(){
+  const r=await fetch("/api/kiosk/lookup?plate="+encodeURIComponent(plate.value));
+  if(!r.ok){out.innerHTML='<div class="box">Kennzeichen nicht gefunden.</div>';return;}
+  const d=await r.json();
+  if(d.total_cents<=0){out.innerHTML='<div class="box">Nichts zu bezahlen.</div>';return;}
+  out.innerHTML=`<div class="box">Parkgebühr: ${eur(d.fee_cents)}<br>Strafe: ${eur(d.fine_cents)}<br><b>Gesamt: ${eur(d.total_cents)}</b></div>
+   <button onclick="pay('card')">Mit Karte zahlen</button>
+   <button onclick="pay('paypal')">Mit PayPal zahlen</button>`;
+}
+async function pay(method){
+  const r=await fetch("/api/kiosk/pay",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({plate:plate.value,method})});
+  const d=await r.json(); if(d.url) location.href=d.url;
+}
+</script></body></html>
